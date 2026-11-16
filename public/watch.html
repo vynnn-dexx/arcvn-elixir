@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#09090b"><title>Watch — arcvnMD</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="/assets/anime.css"></head>
+<body><div class="app-shell"><header class="topbar"><a class="back" href="/anime.html"><i class="fa-solid fa-arrow-left"></i></a><a class="brand" href="/index.html"><span class="brand-mark">A</span><span>arcvn<span class="brand-light">MD</span></span></a></header>
+<main class="watch-main"><span class="eyebrow">NOW PLAYING</span><h1 id="watchTitle">Nonton Anime</h1><div class="player-wrap" id="playerWrap"><div id="playerNotice" class="player-notice"><i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke server video...</div></div><div id="serverList" class="server-list"></div><a class="back-link" id="backDetail" href="/anime.html"><i class="fa-solid fa-arrow-left"></i> Kembali</a></main>
+<nav class="bottom-nav"><a class="nav-item" href="/index.html"><i class="fa-solid fa-house"></i>Home</a><a class="nav-item active" href="/anime.html"><i class="fa-solid fa-grip"></i>Anime</a><a class="nav-item" href="/anime.html#searchInput"><i class="fa-solid fa-magnifying-glass"></i>Cari</a><a class="nav-item" href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false"><i class="fa-solid fa-arrow-up"></i>Atas</a></nav></div>
+<script>
+const params=new URLSearchParams(location.search),episodeUrl=params.get('url'),title=params.get('title')||'Nonton Anime';
+const notice=document.querySelector('#playerNotice'),wrap=document.querySelector('#playerWrap'),serverList=document.querySelector('#serverList');
+document.querySelector('#watchTitle').textContent=title;document.title=title+' — arcvnMD';
+function setSource(source){
+ if(!source)return;
+ wrap.querySelector('iframe,video')?.remove();notice?.remove();
+ if(/\.(mp4|webm|m3u8)(\?|$)/i.test(source)){
+   const video=document.createElement('video');video.src=source;video.controls=true;video.playsInline=true;video.preload='metadata';video.style.cssText='width:100%;height:100%;background:#000';wrap.append(video);
+ }else{
+   const frame=document.createElement('iframe');frame.src=source;frame.title=title;frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';frame.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;background:#000';wrap.append(frame);
+ }
+}
+(async()=>{try{
+ if(!episodeUrl)throw Error('URL episode tidak ditemukan.');
+ const response=await fetch('/api/anime?stream='+encodeURIComponent(episodeUrl),{headers:{Accept:'application/json'}});
+ const json=await response.json();
+ if(!response.ok||json.success===false)throw Error(json.message||'API stream gagal.');
+ const data=json.data||{},source=data.streamUrl||data.url||data.embed;
+ if(!source)throw Error('API tidak mengirim data.streamUrl.');
+ setSource(source);
+ const alternatives=Array.isArray(data.alternativeLinks)?data.alternativeLinks:[];
+ if(alternatives.length){serverList.innerHTML='<span class="server-label">SERVER CADANGAN</span>'+alternatives.map((item,index)=>{const url=typeof item==='string'?item:(item.url||item.link||item.streamUrl);const label=typeof item==='object'?(item.name||item.title||`Server ${index+2}`):`Server ${index+2}`;return url?`<button class="server-btn" data-src="${encodeURIComponent(url)}">${esc(label)}</button>`:''}).join('');serverList.querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>setSource(decodeURIComponent(button.dataset.src))));}
+}catch(error){notice.innerHTML=`<div><i class="fa-solid fa-triangle-exclamation"></i><p>Gagal memuat video</p><small>${String(error.message).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</small></div>`;}}
+)();
+function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+</script></body></html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#09090b"><meta name="description" content="Detail anime dan daftar episode arcvnMD"><title>Detail Anime — arcvnMD</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="/assets/anime.css"></head>
+<body><div class="app-shell"><header class="topbar"><a class="back" href="/anime.html" aria-label="Kembali ke katalog"><i class="fa-solid fa-arrow-left"></i></a><a class="brand" href="/index.html"><span class="brand-mark">A</span><span>arcvn<span class="brand-light">MD</span></span></a></header>
+<main id="detail" class="watch-main"><div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Memuat detail anime...</div></main>
+<nav class="bottom-nav"><a class="nav-item" href="/index.html"><i class="fa-solid fa-house"></i>Home</a><a class="nav-item active" href="/anime.html"><i class="fa-solid fa-grip"></i>Anime</a><a class="nav-item" href="/anime.html#searchInput"><i class="fa-solid fa-magnifying-glass"></i>Cari</a><a class="nav-item" href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false"><i class="fa-solid fa-arrow-up"></i>Atas</a></nav></div>
+<script>
+const root=document.querySelector('#detail');
+const animeUrl=new URLSearchParams(location.search).get('url');
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clean=value=>String(value??'').replace(/[\t\r\n]+/g,' ').replace(/\s+/g,' ').trim();
+const list=value=>Array.isArray(value)?value:value&&typeof value==='object'?Object.values(value):[];
+(async()=>{try{
+ if(!animeUrl)throw Error('URL anime tidak ada di alamat halaman.');
+ const response=await fetch('/api/anime?details='+encodeURIComponent(animeUrl),{headers:{Accept:'application/json'}});
+ const json=await response.json();
+ if(!response.ok||json.success===false)throw Error(json.message||'API detail gagal.');
+ const data=json.data||{},info=data.info||{},episodes=list(data.episodes);
+ const title=clean(data.title||'Detail Anime');
+ const genres=list(data.genres);
+ const infoHtml=Object.entries(info).map(([key,value])=>`<div class="info-row"><span>${esc(key)}</span><b>${esc(Array.isArray(value)?value.join(', '):value)}</b></div>`).join('');
+ const episodeHtml=episodes.map((episode,index)=>{
+   const episodeUrl=episode.episodeUrl||episode.link||episode.url||'';
+   const episodeTitle=clean(episode.title||episode.episode||`Episode ${index+1}`);
+   return `<a class="episode-item" href="/watch.html?url=${encodeURIComponent(episodeUrl)}&title=${encodeURIComponent(episodeTitle)}" ${episodeUrl?'':'aria-disabled="true"'}><span class="episode-icon"><i class="fa-solid fa-play"></i></span><span class="episode-copy"><b>${esc(episodeTitle)}</b><small>${esc(episode.date||episode.episode||`Episode ${index+1}`)}</small></span><i class="fa-solid fa-chevron-right episode-arrow"></i></a>`;
+ }).join('');
+ root.innerHTML=`<div class="detail-hero"><div class="detail-poster">${data.image?`<img src="${esc(data.image)}" alt="${esc(title)}">`:'<i class="fa-solid fa-film"></i>'}</div><div class="detail-main"><span class="eyebrow">ANIME DETAIL</span><h1>${esc(title)}</h1><p class="synopsis">${esc(data.sinopsis||'Sinopsis belum tersedia.')}</p><div class="genre-list">${genres.map(genre=>`<span>${esc(genre)}</span>`).join('')}</div><div class="info-list">${infoHtml}</div></div></div><section class="episode-section"><div class="section-head"><div><span class="eyebrow">WATCH NOW</span><h2>Daftar Episode</h2></div><span class="episode-count">${episodes.length} Episode</span></div><div class="episode-list">${episodeHtml||'<div class="empty"><i class="fa-solid fa-film"></i><strong>Episode belum tersedia</strong></div>'}</div></section>`;
+ document.title=title+' — arcvnMD';
+}catch(error){root.innerHTML=`<div class="empty error-state"><i class="fa-solid fa-triangle-exclamation"></i><strong>Gagal memuat detail</strong><span>${esc(error.message)}</span><a class="card-open" href="/anime.html">Kembali ke katalog</a></div>`;}})();
+</script></body></html>

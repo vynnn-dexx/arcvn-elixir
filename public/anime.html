@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#09090b"><meta name="description" content="arcvnMD anime catalog">
+  <title>arcvnMD — Anime</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/assets/anime.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="back" href="/index.html" aria-label="Kembali ke halaman utama">←</a>
+      <a class="brand" href="/anime.html"><span class="brand-mark">A</span><span>arcvn<span class="brand-light">MD</span></span></a>
+
+    </header>
+    <main>
+      <section class="hero">
+        <div class="hero-copy"><span class="eyebrow"><i></i> ANIME DIRECTORY</span><h1>Temukan anime<br><span>favorit lu.</span></h1><p>Update katalog, cari judul, dan lanjutkan tontonan lu.</p></div>
+        <div class="hero-art" aria-hidden="true"><div class="orb"></div><div class="hero-letter">A</div><div class="hero-chip">ARC / ANIME</div></div>
+      </section>
+      <form class="search" id="searchForm"><span><i class="fa-solid fa-magnifying-glass"></i></span><input id="searchInput" placeholder="Cari anime..." autocomplete="off"><button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Cari</button></form>
+      <section class="section-head"><div><span class="eyebrow">KOLEKSI</span><h2 id="sectionTitle">Anime Terbaru</h2></div><button class="refresh" id="refreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button></section>
+      <nav class="filters" aria-label="Filter anime"><button class="filter active" data-type="ongoing" data-label="Anime Terbaru">Terbaru</button><button class="filter" data-type="completed" data-label="Anime Completed">Completed</button></nav>
+      <div id="status" class="status" aria-live="polite">Menyiapkan katalog...</div>
+      <section id="animeGrid" class="anime-grid" aria-live="polite"></section>
+      <div class="pagination"><button id="prevBtn" disabled><i class="fa-solid fa-arrow-left"></i> Sebelumnya</button><span id="pageLabel">Halaman 1</span><button id="nextBtn">Berikutnya <i class="fa-solid fa-arrow-right"></i></button></div>
+    </main>
+    <nav class="bottom-nav"><a class="nav-item" href="/index.html"><i class="fa-solid fa-house"></i>Home</a><a class="nav-item active" href="/anime.html"><i class="fa-solid fa-grip"></i>Anime</a><a class="nav-item" href="#searchInput" id="navSearch"><i class="fa-solid fa-magnifying-glass"></i>Cari</a><a class="nav-item" href="#top" id="navTop"><i class="fa-solid fa-arrow-up"></i>Atas</a></nav>
+    <footer>arcvnMD <span>•</span> Anime directory</footer>
+  </div>
+  <script src="/assets/anime.js" defer></script>
+</body></html>
